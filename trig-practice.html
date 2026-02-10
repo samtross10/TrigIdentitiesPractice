@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trig Identities Practice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap');
+        
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #F77F00;
+            --success: #06D6A0;
+            --bg: #0A0E27;
+            --surface: #1A1F3A;
+            --text: #E8E9ED;
+            --text-dim: #9BA3C0;
+            --border: #2D3454;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 107, 53, 0.03) 2px, rgba(255, 107, 53, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 78, 137, 0.03) 2px, rgba(0, 78, 137, 0.03) 4px);
+            background-size: 40px 40px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        
+        .stat-box {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .mode-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .mode-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+        
+        .mode-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mode-card:hover::before {
+            opacity: 1;
+        }
+        
+        .mode-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.3);
+        }
+        
+        .mode-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        
+        .mode-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .back-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--bg);
+        }
+        
+        .flashcard-container {
+            perspective: 1000px;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .card-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+        
+        .card-content {
+            font-size: 1.8rem;
+            color: var(--text);
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .card-hint {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-top: 1rem;
+        }
+        
+        .flashcard-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--bg);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--bg);
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab:hover {
+            color: var(--text);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .problem-area {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            min-height: 300px;
+        }
+        
+        .problem-text {
+            font-size: 1.8rem;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+        
+        .answer-input {
+            width: 100%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .feedback {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(6, 214, 160, 0.2);
+            border: 2px solid var(--success);
+            color: var(--success);
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(255, 107, 53, 0.2);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            display: block;
+        }
+        
+        .problem-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .hint {
+            background: rgba(247, 127, 0, 0.1);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: var(--accent);
+            display: none;
+        }
+        
+        .symbol-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .symbol-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .symbol-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: var(--bg);
+            transform: translateY(-2px);
+        }
+        
+        .symbol-btn:active {
+            transform: translateY(0);
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shimmer {
+            to {
+                left: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mode-select {
+                grid-template-columns: 1fr;
+            }
+            
+            .flashcard {
+                height: 350px;
+            }
+            
+            .problem-area {
+                padding: 1.5rem;
+            }
+            
+            .problem-text {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <header>
+                <h1>Trig Identities</h1>
+                <p class="subtitle">Hope this practice helps!</p>
+            </header>
+            
+            <div class="mode-select">
+                <div class="mode-card" onclick="showPage('flashcardPage')">
+                    <div class="mode-icon">🎴</div>
+                    <div class="mode-title">Flashcards</div>
+                    <div class="mode-desc">Review and memorize key identities</div>
+                </div>
+                <div class="mode-card" onclick="showPage('practicePage')">
+                    <div class="mode-icon">✏️</div>
+                    <div class="mode-title">Practice</div>
+                    <div class="mode-desc">Test your skills with problems</div>
+                </div>
+            </div>
+		
+            <header>
+	        <p class="subtitle"><br><br>Site managed by Sam Ross</p>
+            </header>
+
+        </div>
+        
+        <!-- Flashcard Page -->
+        <div id="flashcardPage" class="page">
+            <button class="back-btn" onclick="showPage('homePage')">← Back to Home</button>
+            
+            <header>
+                <h1>Flashcards</h1>
+                <p class="subtitle">Click to flip</p>
+            </header>
+            
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="card-face">
+                        <div class="card-label">Identity</div>
+                        <div class="card-content" id="flashcardFront"></div>
+                        <div class="card-hint">Click to reveal</div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="card-label">Equivalent Form</div>
+                        <div class="card-content" id="flashcardBack"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flashcard-controls">
+                <button class="btn" onclick="previousCard()">← Previous</button>
+                <button class="btn btn-primary" onclick="nextCard()">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Practice Page -->
+        <div id="practicePage" class="page">
+            <button class="back-btn" onclick="showPage('homePage')">← Back to Home</button>
+            
+            <header>
+                <h1>Practice</h1>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Current Streak</div>
+                        <div class="stat-value" id="streakDisplayPractice">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Score</div>
+                        <div class="stat-value" id="scoreDisplayPractice">0</div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('simplify')">Simplify</button>
+                <button class="tab" onclick="switchTab('solve')">Solve</button>
+            </div>
+            
+            <div id="simplifyTab" class="tab-content">
+                <div class="problem-area">
+                    <div class="problem-text" id="simplifyProblem"></div>
+                    <input type="text" class="answer-input" id="simplifyAnswer" placeholder="Enter your answer...">
+                    <div class="symbol-buttons">
+                        <button class="symbol-btn" onclick="insertSymbol('simplify', 'θ')">θ (theta)</button>
+                        <button class="symbol-btn" onclick="insertSymbol('simplify', 'π')">π (pi)</button>
+                        <button class="symbol-btn" onclick="insertSymbol('simplify', '²')">² (squared)</button>
+                    </div>
+                    <div class="feedback" id="simplifyFeedback"></div>
+                    <div class="hint" id="simplifyHint"></div>
+                </div>
+                <div class="problem-controls">
+                    <button class="btn" onclick="showHint('simplify')">💡 Hint</button>
+                    <button class="btn btn-primary" onclick="checkAnswer('simplify')">Check Answer</button>
+                    <button class="btn" onclick="newProblem('simplify')">Next Problem</button>
+                </div>
+            </div>
+            
+            <div id="solveTab" class="tab-content" style="display: none;">
+                <div class="problem-area">
+                    <div class="problem-text" id="solveProblem"></div>
+                    <input type="text" class="answer-input" id="solveAnswer" placeholder="Enter your answer...">
+                    <div class="symbol-buttons">
+                        <button class="symbol-btn" onclick="insertSymbol('solve', 'θ')">θ (theta)</button>
+                        <button class="symbol-btn" onclick="insertSymbol('solve', 'π')">π (pi)</button>
+                        <button class="symbol-btn" onclick="insertSymbol('solve', '²')">² (squared)</button>
+                    </div>
+                    <div class="feedback" id="solveFeedback"></div>
+                    <div class="hint" id="solveHint"></div>
+                </div>
+                <div class="problem-controls">
+                    <button class="btn" onclick="showHint('solve')">💡 Hint</button>
+                    <button class="btn btn-primary" onclick="checkAnswer('solve')">Check Answer</button>
+                    <button class="btn" onclick="newProblem('solve')">Next Problem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data structures
+        const identities = [
+            { front: "sin²θ + cos²θ", back: "1" },
+            { front: "tan²θ + 1", back: "sec²θ" },
+            { front: "1 + cot²θ", back: "csc²θ" },
+            { front: "sin(2θ)", back: "2sinθcosθ" },
+            { front: "cos(2θ)", back: "cos²θ - sin²θ" },
+            { front: "cos(2θ)", back: "2cos²θ - 1" },
+            { front: "cos(2θ)", back: "1 - 2sin²θ" },
+            { front: "sin²θ", back: "(1 - cos(2θ))/2" },
+            { front: "cos²θ", back: "(1 + cos(2θ))/2" },
+            { front: "tanθ", back: "sinθ/cosθ" },
+            { front: "cotθ", back: "cosθ/sinθ" },
+            { front: "secθ", back: "1/cosθ" },
+            { front: "cscθ", back: "1/sinθ" },
+            { front: "sin(-θ)", back: "-sinθ" },
+            { front: "cos(-θ)", back: "cosθ" },
+            { front: "tan(-θ)", back: "-tanθ" }
+        ];
+        
+        const simplifyProblems = [
+            { problem: "sin²θ + cos²θ", answer: "1", hint: "This is the fundamental Pythagorean identity" },
+            { problem: "sec²θ - tan²θ", answer: "1", hint: "Think about the Pythagorean identity for tangent and secant" },
+            { problem: "csc²θ - cot²θ", answer: "1", hint: "Similar to sec²θ - tan²θ = 1" },
+            { problem: "(sinθ)(cscθ)", answer: "1", hint: "Remember that cscθ = 1/sinθ" },
+            { problem: "tanθ·cosθ", answer: "sinθ", hint: "Write tanθ as sinθ/cosθ" },
+            { problem: "sin(2θ)/2sinθ", answer: "cosθ", hint: "Use the double angle formula for sin(2θ)" },
+            { problem: "1 - cos²θ", answer: "sin²θ", hint: "Rearrange sin²θ + cos²θ = 1" },
+            { problem: "sec²θ - 1", answer: "tan²θ", hint: "Rearrange tan²θ + 1 = sec²θ" }
+        ];
+        
+        const solveProblems = [
+            { problem: "sin²θ = 1/2 (find θ in [0, π])", answer: "π/4", hint: "Think about when sin²θ equals 1/2" },
+            { problem: "cos(2θ) = 0 (find first positive θ)", answer: "π/4", hint: "When does cosine equal zero?" },
+            { problem: "2sin²θ - 1 = 0 (find θ in [0, π/2])", answer: "π/4", hint: "Solve for sin²θ first" },
+            { problem: "tanθ = 1 (find θ in [0, π])", answer: "π/4", hint: "At what angle is tangent equal to 1?" }
+        ];
+        
+        // State
+        let currentCardIndex = 0;
+        let currentSimplifyProblem = 0;
+        let currentSolveProblem = 0;
+        let streak = parseInt(localStorage.getItem('trigStreak')) || 0;
+        let score = parseInt(localStorage.getItem('trigScore')) || 0;
+        
+        // Initialize
+        function init() {
+            updateStats();
+            loadFlashcard();
+            newProblem('simplify');
+            newProblem('solve');
+        }
+        
+        // Stats management
+        function updateStats() {
+            document.getElementById('streakDisplayPractice').textContent = streak;
+            document.getElementById('scoreDisplayPractice').textContent = score;
+            localStorage.setItem('trigStreak', streak);
+            localStorage.setItem('trigScore', score);
+        }
+        
+        function incrementScore() {
+            score++;
+            streak++;
+            updateStats();
+            animateStatBox();
+        }
+        
+        function resetStreak() {
+            streak = 0;
+            updateStats();
+        }
+        
+        function animateStatBox() {
+            const statBoxes = document.querySelectorAll('.stat-value');
+            statBoxes.forEach(box => {
+                box.style.transition = 'transform 0.2s ease';
+                box.style.transform = 'scale(1.2)';
+            });
+            setTimeout(() => {
+                statBoxes.forEach(box => {
+                    box.style.transform = 'scale(1)';
+                });
+            }, 200);
+        }
+        
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find and activate the correct tab
+            const tabs = document.querySelectorAll('.tab');
+            if (tabName === 'simplify') {
+                tabs[0].classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+            }
+            
+            document.getElementById('simplifyTab').style.display = 'none';
+            document.getElementById('solveTab').style.display = 'none';
+            
+            if (tabName === 'simplify') {
+                document.getElementById('simplifyTab').style.display = 'block';
+            } else {
+                document.getElementById('solveTab').style.display = 'block';
+            }
+        }
+        
+        // Flashcard functions
+        function loadFlashcard() {
+            const card = identities[currentCardIndex];
+            document.getElementById('flashcardFront').textContent = card.front;
+            document.getElementById('flashcardBack').textContent = card.back;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+        
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+        
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % identities.length;
+            loadFlashcard();
+        }
+        
+        function previousCard() {
+            currentCardIndex = (currentCardIndex - 1 + identities.length) % identities.length;
+            loadFlashcard();
+        }
+        
+        // Practice functions
+        function newProblem(type) {
+            const problems = type === 'simplify' ? simplifyProblems : solveProblems;
+            const index = Math.floor(Math.random() * problems.length);
+            
+            if (type === 'simplify') {
+                currentSimplifyProblem = index;
+                document.getElementById('simplifyProblem').textContent = problems[index].problem;
+                document.getElementById('simplifyAnswer').value = '';
+                document.getElementById('simplifyFeedback').classList.remove('correct', 'incorrect');
+                document.getElementById('simplifyFeedback').style.display = 'none';
+                document.getElementById('simplifyHint').style.display = 'none';
+            } else {
+                currentSolveProblem = index;
+                document.getElementById('solveProblem').textContent = problems[index].problem;
+                document.getElementById('solveAnswer').value = '';
+                document.getElementById('solveFeedback').classList.remove('correct', 'incorrect');
+                document.getElementById('solveFeedback').style.display = 'none';
+                document.getElementById('solveHint').style.display = 'none';
+            }
+        }
+        
+        function showHint(type) {
+            const problems = type === 'simplify' ? simplifyProblems : solveProblems;
+            const index = type === 'simplify' ? currentSimplifyProblem : currentSolveProblem;
+            const hintElement = document.getElementById(type + 'Hint');
+            
+            hintElement.textContent = problems[index].hint;
+            hintElement.style.display = 'block';
+        }
+        
+        function checkAnswer(type) {
+            const problems = type === 'simplify' ? simplifyProblems : solveProblems;
+            const index = type === 'simplify' ? currentSimplifyProblem : currentSolveProblem;
+            const userAnswer = document.getElementById(type + 'Answer').value.trim().toLowerCase();
+            const correctAnswer = problems[index].answer.toLowerCase();
+            const feedback = document.getElementById(type + 'Feedback');
+            
+            if (!userAnswer) {
+                feedback.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedback.textContent = '⚠ Please enter an answer first!';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            // Normalize answers (remove spaces, handle common variations)
+            const normalizedUser = userAnswer.replace(/\s/g, '').replace(/\*/g, '');
+            const normalizedCorrect = correctAnswer.replace(/\s/g, '').replace(/\*/g, '');
+            
+            // Check various forms
+            const isCorrect = normalizedUser === normalizedCorrect || 
+                normalizedUser === normalizedCorrect.replace('θ', 'theta') ||
+                normalizedUser.replace('theta', 'θ') === normalizedCorrect ||
+                normalizedUser === normalizedCorrect.replace('π', 'pi') ||
+                normalizedUser.replace('pi', 'π') === normalizedCorrect;
+            
+            if (isCorrect) {
+                feedback.classList.remove('incorrect');
+                feedback.classList.add('correct');
+                feedback.textContent = '✓ Correct! Great job!';
+                feedback.style.display = 'block';
+                incrementScore();
+            } else {
+                feedback.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedback.textContent = '✗ Not quite. The answer is: ' + problems[index].answer;
+                feedback.style.display = 'block';
+                resetStreak();
+            }
+        }
+        
+        // Symbol insertion
+        function insertSymbol(type, symbol) {
+            const input = document.getElementById(type + 'Answer');
+            const cursorPos = input.selectionStart;
+            const textBefore = input.value.substring(0, cursorPos);
+            const textAfter = input.value.substring(cursorPos);
+            
+            input.value = textBefore + symbol + textAfter;
+            input.focus();
+            input.setSelectionRange(cursorPos + symbol.length, cursorPos + symbol.length);
+        }
+        
+        // Auto-replace text with symbols
+        function autoReplaceSymbols(inputElement) {
+            let value = inputElement.value;
+            const cursorPos = inputElement.selectionStart;
+            
+            // Store original length
+            const originalLength = value.length;
+            
+            // Replace text with symbols
+            value = value.replace(/theta/gi, 'θ');
+            value = value.replace(/pi/gi, 'π');
+            
+            // Handle squared - replace ^2 with ²
+            value = value.replace(/\^2/g, '²');
+            
+            // Update input value
+            inputElement.value = value;
+            
+            // Adjust cursor position based on length change
+            const lengthDiff = value.length - originalLength;
+            inputElement.setSelectionRange(cursorPos + lengthDiff, cursorPos + lengthDiff);
+        }
+        
+        // Enter key support
+        document.addEventListener('DOMContentLoaded', function() {
+            const simplifyInput = document.getElementById('simplifyAnswer');
+            const solveInput = document.getElementById('solveAnswer');
+            
+            simplifyInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkAnswer('simplify');
+            });
+            
+            solveInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkAnswer('solve');
+            });
+            
+            // Add auto-replacement on input
+            simplifyInput.addEventListener('input', function() {
+                autoReplaceSymbols(this);
+            });
+            
+            solveInput.addEventListener('input', function() {
+                autoReplaceSymbols(this);
+            });
+        });
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
