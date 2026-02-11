@@ -209,6 +209,16 @@
             perspective: 1000px;
             max-width: 600px;
             margin: 2rem auto;
+            position: relative;
+        }
+        
+        .card-counter {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
         }
         
         .flashcard {
@@ -218,6 +228,40 @@
             transition: transform 0.6s;
             transform-style: preserve-3d;
             cursor: pointer;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .flashcard.slide-out-left {
+            animation: slideOutLeft 0.3s ease-out;
+        }
+        
+        .flashcard.slide-out-right {
+            animation: slideOutRight 0.3s ease-out;
+        }
+        
+        @keyframes slideOutLeft {
+            to {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            to {
+                opacity: 0;
+                transform: translateX(50px);
+            }
         }
         
         .flashcard.flipped {
@@ -405,6 +449,49 @@
             display: none;
         }
         
+        .detailed-explanation {
+            background: rgba(6, 214, 160, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .detailed-explanation.show {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .explanation-title {
+            color: var(--success);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .explanation-steps {
+            color: var(--text);
+            line-height: 1.8;
+        }
+        
+        .explanation-steps li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .unit-circle-container {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .unit-circle {
+            max-width: 300px;
+            margin: 1rem auto;
+            filter: drop-shadow(0 4px 12px rgba(6, 214, 160, 0.3));
+        }
+        
         .symbol-buttons {
             display: flex;
             gap: 0.5rem;
@@ -435,6 +522,25 @@
         
         .symbol-btn:active {
             transform: translateY(0);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: var(--accent);
         }
         
         @keyframes slideDown {
@@ -508,7 +614,7 @@
         <div id="homePage" class="page active">
             <header>
                 <h1>Trig Identities</h1>
-                <p class="subtitle">Hope this practice helps!</p>
+                <p class="subtitle">I hope this helps!</p>
             </header>
             
             <div class="mode-select">
@@ -523,11 +629,6 @@
                     <div class="mode-desc">Test your skills with problems</div>
                 </div>
             </div>
-		
-            <header>
-	        <p class="subtitle"><br><br>Site managed by Sam Ross</p>
-            </header>
-
         </div>
         
         <!-- Flashcard Page -->
@@ -539,7 +640,15 @@
                 <p class="subtitle">Click to flip</p>
             </header>
             
+            <div class="tabs">
+                <button class="tab active" onclick="switchFlashcardTab('all')">All</button>
+                <button class="tab" onclick="switchFlashcardTab('pythagorean')">Pythagorean</button>
+                <button class="tab" onclick="switchFlashcardTab('double')">Double Angle</button>
+                <button class="tab" onclick="switchFlashcardTab('reciprocal')">Reciprocal</button>
+            </div>
+            
             <div class="flashcard-container">
+                <div class="card-counter" id="cardCounter">Card 1 of 16</div>
                 <div class="flashcard" id="flashcard" onclick="flipCard()">
                     <div class="card-face">
                         <div class="card-label">Identity</div>
@@ -593,6 +702,11 @@
                     </div>
                     <div class="feedback" id="simplifyFeedback"></div>
                     <div class="hint" id="simplifyHint"></div>
+                    <div class="detailed-explanation" id="simplifyExplanation">
+                        <div class="explanation-title">✓ Solution Breakdown</div>
+                        <div class="explanation-steps" id="simplifySteps"></div>
+                        <div class="unit-circle-container" id="simplifyUnitCircle"></div>
+                    </div>
                 </div>
                 <div class="problem-controls">
                     <button class="btn" onclick="showHint('simplify')">💡 Hint</button>
@@ -612,6 +726,11 @@
                     </div>
                     <div class="feedback" id="solveFeedback"></div>
                     <div class="hint" id="solveHint"></div>
+                    <div class="detailed-explanation" id="solveExplanation">
+                        <div class="explanation-title">✓ Solution Breakdown</div>
+                        <div class="explanation-steps" id="solveSteps"></div>
+                        <div class="unit-circle-container" id="solveUnitCircle"></div>
+                    </div>
                 </div>
                 <div class="problem-controls">
                     <button class="btn" onclick="showHint('solve')">💡 Hint</button>
@@ -622,43 +741,197 @@
         </div>
     </div>
     
+    <footer>
+        Site managed by Sam Ross
+    </footer>
+    
     <script>
         // Data structures
-        const identities = [
-            { front: "sin²θ + cos²θ", back: "1" },
-            { front: "tan²θ + 1", back: "sec²θ" },
-            { front: "1 + cot²θ", back: "csc²θ" },
-            { front: "sin(2θ)", back: "2sinθcosθ" },
-            { front: "cos(2θ)", back: "cos²θ - sin²θ" },
-            { front: "cos(2θ)", back: "2cos²θ - 1" },
-            { front: "cos(2θ)", back: "1 - 2sin²θ" },
-            { front: "sin²θ", back: "(1 - cos(2θ))/2" },
-            { front: "cos²θ", back: "(1 + cos(2θ))/2" },
-            { front: "tanθ", back: "sinθ/cosθ" },
-            { front: "cotθ", back: "cosθ/sinθ" },
-            { front: "secθ", back: "1/cosθ" },
-            { front: "cscθ", back: "1/sinθ" },
-            { front: "sin(-θ)", back: "-sinθ" },
-            { front: "cos(-θ)", back: "cosθ" },
-            { front: "tan(-θ)", back: "-tanθ" }
+        const allIdentities = [
+            { front: "sin²θ + cos²θ", back: "1", category: "pythagorean" },
+            { front: "tan²θ + 1", back: "sec²θ", category: "pythagorean" },
+            { front: "1 + cot²θ", back: "csc²θ", category: "pythagorean" },
+            { front: "sin(2θ)", back: "2sinθcosθ", category: "double" },
+            { front: "cos(2θ)", back: "cos²θ - sin²θ", category: "double" },
+            { front: "cos(2θ)", back: "2cos²θ - 1", category: "double" },
+            { front: "cos(2θ)", back: "1 - 2sin²θ", category: "double" },
+            { front: "sin²θ", back: "(1 - cos(2θ))/2", category: "double" },
+            { front: "cos²θ", back: "(1 + cos(2θ))/2", category: "double" },
+            { front: "tanθ", back: "sinθ/cosθ", category: "reciprocal" },
+            { front: "cotθ", back: "cosθ/sinθ", category: "reciprocal" },
+            { front: "secθ", back: "1/cosθ", category: "reciprocal" },
+            { front: "cscθ", back: "1/sinθ", category: "reciprocal" },
+            { front: "sin(-θ)", back: "-sinθ", category: "reciprocal" },
+            { front: "cos(-θ)", back: "cosθ", category: "reciprocal" },
+            { front: "tan(-θ)", back: "-tanθ", category: "reciprocal" }
         ];
         
+        let identities = [...allIdentities];
+        let currentFlashcardCategory = 'all';
+        
         const simplifyProblems = [
-            { problem: "sin²θ + cos²θ", answer: "1", hint: "This is the fundamental Pythagorean identity" },
-            { problem: "sec²θ - tan²θ", answer: "1", hint: "Think about the Pythagorean identity for tangent and secant" },
-            { problem: "csc²θ - cot²θ", answer: "1", hint: "Similar to sec²θ - tan²θ = 1" },
-            { problem: "(sinθ)(cscθ)", answer: "1", hint: "Remember that cscθ = 1/sinθ" },
-            { problem: "tanθ·cosθ", answer: "sinθ", hint: "Write tanθ as sinθ/cosθ" },
-            { problem: "sin(2θ)/2sinθ", answer: "cosθ", hint: "Use the double angle formula for sin(2θ)" },
-            { problem: "1 - cos²θ", answer: "sin²θ", hint: "Rearrange sin²θ + cos²θ = 1" },
-            { problem: "sec²θ - 1", answer: "tan²θ", hint: "Rearrange tan²θ + 1 = sec²θ" }
+            { 
+                problem: "sin²θ + cos²θ", 
+                answer: "1", 
+                hint: "This is the fundamental Pythagorean identity. It's true for all values of θ.",
+                explanation: [
+                    "This is the Pythagorean Identity, one of the most fundamental identities in trigonometry.",
+                    "For any angle θ, the point (cos θ, sin θ) lies on the unit circle.",
+                    "By the Pythagorean theorem: x² + y² = 1",
+                    "Substituting: cos²θ + sin²θ = 1",
+                    "Therefore: sin²θ + cos²θ = 1"
+                ],
+                showUnitCircle: true
+            },
+            { 
+                problem: "sec²θ - tan²θ", 
+                answer: "1", 
+                hint: "Start with the Pythagorean identity and divide everything by cos²θ.",
+                explanation: [
+                    "Start with the Pythagorean identity: sin²θ + cos²θ = 1",
+                    "Divide both sides by cos²θ: sin²θ/cos²θ + cos²θ/cos²θ = 1/cos²θ",
+                    "Simplify using tan θ = sin θ/cos θ and sec θ = 1/cos θ:",
+                    "tan²θ + 1 = sec²θ",
+                    "Rearrange: sec²θ - tan²θ = 1"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "csc²θ - cot²θ", 
+                answer: "1", 
+                hint: "Similar to sec²θ - tan²θ = 1, but divide by sin²θ instead.",
+                explanation: [
+                    "Start with the Pythagorean identity: sin²θ + cos²θ = 1",
+                    "Divide both sides by sin²θ: sin²θ/sin²θ + cos²θ/sin²θ = 1/sin²θ",
+                    "Simplify using cot θ = cos θ/sin θ and csc θ = 1/sin θ:",
+                    "1 + cot²θ = csc²θ",
+                    "Rearrange: csc²θ - cot²θ = 1"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "(sinθ)(cscθ)", 
+                answer: "1", 
+                hint: "Remember that cscθ = 1/sinθ. What happens when you multiply a number by its reciprocal?",
+                explanation: [
+                    "Recall that csc θ is the reciprocal of sin θ: csc θ = 1/sin θ",
+                    "Substitute: (sin θ)(csc θ) = (sin θ)(1/sin θ)",
+                    "Multiply: = sin θ/sin θ",
+                    "Simplify: = 1",
+                    "Any non-zero number multiplied by its reciprocal equals 1!"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "tanθ·cosθ", 
+                answer: "sinθ", 
+                hint: "Write tanθ as sinθ/cosθ, then simplify.",
+                explanation: [
+                    "Recall that tan θ = sin θ/cos θ",
+                    "Substitute: tan θ · cos θ = (sin θ/cos θ) · cos θ",
+                    "Multiply: = (sin θ · cos θ)/cos θ",
+                    "Cancel cos θ: = sin θ",
+                    "The cosine terms cancel out!"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "sin(2θ)/2sinθ", 
+                answer: "cosθ", 
+                hint: "Use the double angle formula: sin(2θ) = 2sin θ cos θ",
+                explanation: [
+                    "Use the double angle formula: sin(2θ) = 2sin θ cos θ",
+                    "Substitute: sin(2θ)/(2sin θ) = (2sin θ cos θ)/(2sin θ)",
+                    "Cancel 2sin θ from numerator and denominator: = cos θ",
+                    "Final answer: cos θ"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "1 - cos²θ", 
+                answer: "sin²θ", 
+                hint: "Rearrange sin²θ + cos²θ = 1 to isolate sin²θ.",
+                explanation: [
+                    "Start with the Pythagorean identity: sin²θ + cos²θ = 1",
+                    "Subtract cos²θ from both sides: sin²θ = 1 - cos²θ",
+                    "Therefore: 1 - cos²θ = sin²θ",
+                    "This is useful for converting between sin² and cos²!"
+                ],
+                showUnitCircle: false
+            },
+            { 
+                problem: "sec²θ - 1", 
+                answer: "tan²θ", 
+                hint: "Rearrange tan²θ + 1 = sec²θ to isolate tan²θ.",
+                explanation: [
+                    "Start with the Pythagorean identity for tangent: tan²θ + 1 = sec²θ",
+                    "Subtract 1 from both sides: tan²θ = sec²θ - 1",
+                    "Therefore: sec²θ - 1 = tan²θ",
+                    "This identity is very useful in calculus!"
+                ],
+                showUnitCircle: false
+            }
         ];
         
         const solveProblems = [
-            { problem: "sin²θ = 1/2 (find θ in [0, π])", answer: "π/4", hint: "Think about when sin²θ equals 1/2" },
-            { problem: "cos(2θ) = 0 (find first positive θ)", answer: "π/4", hint: "When does cosine equal zero?" },
-            { problem: "2sin²θ - 1 = 0 (find θ in [0, π/2])", answer: "π/4", hint: "Solve for sin²θ first" },
-            { problem: "tanθ = 1 (find θ in [0, π])", answer: "π/4", hint: "At what angle is tangent equal to 1?" }
+            { 
+                problem: "sin²θ = 1/2 (find θ in [0, π])", 
+                answer: "π/4", 
+                hint: "Take the square root of both sides, then think about which angle in the first two quadrants has that sine value.",
+                explanation: [
+                    "Given: sin²θ = 1/2",
+                    "Take the square root of both sides: sin θ = ±√(1/2) = ±1/√2 = ±√2/2",
+                    "In the interval [0, π], we need sin θ = √2/2 (positive in quadrants I and II)",
+                    "On the unit circle, sin θ = √2/2 when θ = π/4 (45°)",
+                    "Therefore: θ = π/4"
+                ],
+                showUnitCircle: true,
+                angle: "π/4"
+            },
+            { 
+                problem: "cos(2θ) = 0 (find first positive θ)", 
+                answer: "π/4", 
+                hint: "When does cosine equal zero? At π/2, 3π/2, etc. Set 2θ equal to these values.",
+                explanation: [
+                    "Given: cos(2θ) = 0",
+                    "Cosine equals zero at π/2, 3π/2, 5π/2, etc.",
+                    "So: 2θ = π/2 (choosing the first positive value)",
+                    "Divide both sides by 2: θ = π/4",
+                    "Check: cos(2·π/4) = cos(π/2) = 0 ✓"
+                ],
+                showUnitCircle: true,
+                angle: "π/4"
+            },
+            { 
+                problem: "2sin²θ - 1 = 0 (find θ in [0, π/2])", 
+                answer: "π/4", 
+                hint: "Solve for sin²θ first, then take the square root.",
+                explanation: [
+                    "Given: 2sin²θ - 1 = 0",
+                    "Add 1 to both sides: 2sin²θ = 1",
+                    "Divide by 2: sin²θ = 1/2",
+                    "Take the square root: sin θ = √(1/2) = √2/2 (positive in [0, π/2])",
+                    "On the unit circle: θ = π/4",
+                    "Therefore: θ = π/4"
+                ],
+                showUnitCircle: true,
+                angle: "π/4"
+            },
+            { 
+                problem: "tanθ = 1 (find θ in [0, π])", 
+                answer: "π/4", 
+                hint: "At what angle is tangent equal to 1? Think about when sin θ = cos θ.",
+                explanation: [
+                    "Given: tan θ = 1",
+                    "Recall that tan θ = sin θ/cos θ",
+                    "So we need: sin θ/cos θ = 1",
+                    "This means: sin θ = cos θ",
+                    "On the unit circle, this happens at θ = π/4 (45°)",
+                    "At π/4: sin(π/4) = cos(π/4) = √2/2, so tan(π/4) = 1 ✓"
+                ],
+                showUnitCircle: true,
+                angle: "π/4"
+            }
         ];
         
         // State
@@ -741,11 +1014,40 @@
         }
         
         // Flashcard functions
+        function switchFlashcardTab(category) {
+            // Update active tab
+            const tabs = document.querySelectorAll('#flashcardPage .tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            if (category === 'all') tabs[0].classList.add('active');
+            else if (category === 'pythagorean') tabs[1].classList.add('active');
+            else if (category === 'double') tabs[2].classList.add('active');
+            else if (category === 'reciprocal') tabs[3].classList.add('active');
+            
+            // Filter identities
+            currentFlashcardCategory = category;
+            if (category === 'all') {
+                identities = [...allIdentities];
+            } else {
+                identities = allIdentities.filter(id => id.category === category);
+            }
+            
+            // Reset to first card
+            currentCardIndex = 0;
+            loadFlashcard();
+        }
+        
+        function updateCardCounter() {
+            document.getElementById('cardCounter').textContent = 
+                `Card ${currentCardIndex + 1} of ${identities.length}`;
+        }
+        
         function loadFlashcard() {
             const card = identities[currentCardIndex];
             document.getElementById('flashcardFront').textContent = card.front;
             document.getElementById('flashcardBack').textContent = card.back;
             document.getElementById('flashcard').classList.remove('flipped');
+            updateCardCounter();
         }
         
         function flipCard() {
@@ -753,16 +1055,75 @@
         }
         
         function nextCard() {
-            currentCardIndex = (currentCardIndex + 1) % identities.length;
-            loadFlashcard();
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.add('slide-out-left');
+            
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex + 1) % identities.length;
+                flashcard.classList.remove('slide-out-left');
+                loadFlashcard();
+            }, 300);
         }
         
         function previousCard() {
-            currentCardIndex = (currentCardIndex - 1 + identities.length) % identities.length;
-            loadFlashcard();
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.add('slide-out-right');
+            
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex - 1 + identities.length) % identities.length;
+                flashcard.classList.remove('slide-out-right');
+                loadFlashcard();
+            }, 300);
         }
         
         // Practice functions
+        function generateUnitCircle(angle) {
+            const svg = `
+                <svg class="unit-circle" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background circle -->
+                    <circle cx="120" cy="120" r="100" fill="none" stroke="#2D3454" stroke-width="2"/>
+                    
+                    <!-- Axes -->
+                    <line x1="20" y1="120" x2="220" y2="120" stroke="#9BA3C0" stroke-width="1.5"/>
+                    <line x1="120" y1="20" x2="120" y2="220" stroke="#9BA3C0" stroke-width="1.5"/>
+                    
+                    <!-- Angle arc -->
+                    ${angle ? `<path d="M 140,120 A 20,20 0 0,0 ${120 + 20*Math.cos(angle)},${120 - 20*Math.sin(angle)}" 
+                        fill="none" stroke="#FF6B35" stroke-width="2"/>` : ''}
+                    
+                    <!-- Radius line to point -->
+                    ${angle ? `<line x1="120" y1="120" x2="${120 + 100*Math.cos(angle)}" y2="${120 - 100*Math.sin(angle)}" 
+                        stroke="#06D6A0" stroke-width="3"/>` : ''}
+                    
+                    <!-- Point on circle -->
+                    ${angle ? `<circle cx="${120 + 100*Math.cos(angle)}" cy="${120 - 100*Math.sin(angle)}" 
+                        r="5" fill="#06D6A0"/>` : ''}
+                    
+                    <!-- Vertical line (sin) -->
+                    ${angle ? `<line x1="${120 + 100*Math.cos(angle)}" y1="${120 - 100*Math.sin(angle)}" 
+                        x2="${120 + 100*Math.cos(angle)}" y2="120" stroke="#F77F00" stroke-width="2" stroke-dasharray="3,3"/>` : ''}
+                    
+                    <!-- Horizontal line (cos) -->
+                    ${angle ? `<line x1="120" y1="120" x2="${120 + 100*Math.cos(angle)}" y2="120" 
+                        stroke="#004E89" stroke-width="2" stroke-dasharray="3,3"/>` : ''}
+                    
+                    <!-- Labels -->
+                    <text x="225" y="125" fill="#9BA3C0" font-size="14">x</text>
+                    <text x="115" y="15" fill="#9BA3C0" font-size="14">y</text>
+                    
+                    <!-- Key points -->
+                    <circle cx="220" cy="120" r="3" fill="#9BA3C0"/>
+                    <circle cx="120" cy="20" r="3" fill="#9BA3C0"/>
+                    <circle cx="20" cy="120" r="3" fill="#9BA3C0"/>
+                    <circle cx="120" cy="220" r="3" fill="#9BA3C0"/>
+                    
+                    <!-- Angle label -->
+                    ${angle ? `<text x="145" y="110" fill="#FF6B35" font-size="12" font-weight="600">θ</text>` : ''}
+                </svg>
+            `;
+            return svg;
+        }
+        
         function newProblem(type) {
             const problems = type === 'simplify' ? simplifyProblems : solveProblems;
             const index = Math.floor(Math.random() * problems.length);
@@ -774,6 +1135,7 @@
                 document.getElementById('simplifyFeedback').classList.remove('correct', 'incorrect');
                 document.getElementById('simplifyFeedback').style.display = 'none';
                 document.getElementById('simplifyHint').style.display = 'none';
+                document.getElementById('simplifyExplanation').classList.remove('show');
             } else {
                 currentSolveProblem = index;
                 document.getElementById('solveProblem').textContent = problems[index].problem;
@@ -781,6 +1143,7 @@
                 document.getElementById('solveFeedback').classList.remove('correct', 'incorrect');
                 document.getElementById('solveFeedback').style.display = 'none';
                 document.getElementById('solveHint').style.display = 'none';
+                document.getElementById('solveExplanation').classList.remove('show');
             }
         }
         
@@ -799,12 +1162,16 @@
             const userAnswer = document.getElementById(type + 'Answer').value.trim().toLowerCase();
             const correctAnswer = problems[index].answer.toLowerCase();
             const feedback = document.getElementById(type + 'Feedback');
+            const explanation = document.getElementById(type + 'Explanation');
+            const stepsElement = document.getElementById(type + 'Steps');
+            const unitCircleElement = document.getElementById(type + 'UnitCircle');
             
             if (!userAnswer) {
                 feedback.classList.remove('correct');
                 feedback.classList.add('incorrect');
                 feedback.textContent = '⚠ Please enter an answer first!';
                 feedback.style.display = 'block';
+                explanation.classList.remove('show');
                 return;
             }
             
@@ -825,11 +1192,34 @@
                 feedback.textContent = '✓ Correct! Great job!';
                 feedback.style.display = 'block';
                 incrementScore();
+                
+                // Show detailed explanation
+                const problem = problems[index];
+                const stepsHTML = '<ol style="margin-left: 1.5rem;">' + 
+                    problem.explanation.map(step => `<li>${step}</li>`).join('') + 
+                    '</ol>';
+                stepsElement.innerHTML = stepsHTML;
+                
+                // Show unit circle if applicable
+                if (problem.showUnitCircle) {
+                    let angleRad = 0;
+                    if (problem.angle === 'π/4') angleRad = Math.PI / 4;
+                    else if (problem.angle === 'π/3') angleRad = Math.PI / 3;
+                    else if (problem.angle === 'π/6') angleRad = Math.PI / 6;
+                    
+                    unitCircleElement.innerHTML = '<p style="color: var(--text-dim); margin-bottom: 0.5rem; font-size: 0.9rem;">Unit Circle Visualization:</p>' + 
+                        generateUnitCircle(angleRad);
+                } else {
+                    unitCircleElement.innerHTML = '';
+                }
+                
+                explanation.classList.add('show');
             } else {
                 feedback.classList.remove('correct');
                 feedback.classList.add('incorrect');
                 feedback.textContent = '✗ Not quite. The answer is: ' + problems[index].answer;
                 feedback.style.display = 'block';
+                explanation.classList.remove('show');
                 resetStreak();
             }
         }
